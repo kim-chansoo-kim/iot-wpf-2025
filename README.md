@@ -256,6 +256,9 @@ IoT 개발자 WPF 학습리포지토리 2025년
     <img src="./image/wpf0010.png" width="600">
 
 
+https://github.com/user-attachments/assets/0fe51d30-a1f7-4e1a-94f5-26e9d112feb6
+
+
 ## 4일차
 
 ### DB연결 CRUD 연습(계속)
