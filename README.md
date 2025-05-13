@@ -262,15 +262,31 @@ https://github.com/user-attachments/assets/0fe51d30-a1f7-4e1a-94f5-26e9d112feb6
 ## 4일차
 
 ### DB연결 CRUD 연습(계속)
-1.
+1. BookGenre에서 INSERT, UPDATE
+2. NLog.config 생성
+3. Helpers.Common 클래스 생성
+    - NLog 인스턴스 생성
+    - 공통 DB연결문자열 생성
+    - MahApps.Metro 다이얼로그 코디네이터 생성
+4. 각 ViewModel에 IDialogCoordinator 관련 코딩 추가
+    - ViewModel 생성자에 파라미터 추가
+    - View, ViewModel 연동시 IDialogCoordinator 연결
+5. View에 Dialog관련 네임스페이스와 속성 추가
+6. await this.dialogCoordinator.ShowMessageAsync() 사용
+
+    <img src="./image/wpf0011.png" width="650">
+
+7. BooksView.xaml 화면작업
+8. MemberView.xaml, ReantalView.xaml 화면 작업
+9. ViewModel들 작업
 
 #### DB연결 CRUD 연습 시 필요사항
-- [ ] NLog로 각 기능 동작시 로그남기기. 공통화 작업
-- [ ] DB쿼리 모델로 이전
-- [ ] 연결문자열 Common으로 이전
-- [ ] MahApps.Metro 메시지형태로 변경
-- [ ] 삭제여부 메시지박스 추가
-- [ ] 종료 메뉴아이템
+- [x] 여러번 나오는 로직 메서드화
+- [x] NLog로 각 기능 동작시 로그남기기. 공통화 작업
+- [x] 연결문자열 Common으로 이전
+- [x] 종료 메뉴 다이얼로그 MetroUI로 변경
+- [x] MahApps.Metro 메시지형태로 변경
+- [x] 삭제여부 메시지박스 추가
 
 
 
