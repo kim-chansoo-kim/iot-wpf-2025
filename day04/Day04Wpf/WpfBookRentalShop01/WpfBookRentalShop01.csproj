@@ -22,6 +22,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\RentalsView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\MembersView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="NLog.config">
       <Generator>MSBuild:Compile</Generator>
     </None>

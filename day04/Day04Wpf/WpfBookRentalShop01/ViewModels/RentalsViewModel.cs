@@ -10,53 +10,50 @@ using System.Text;
 using System.Threading.Tasks;
 using WpfBookRentalShop01.Helpers;
 using WpfBookRentalShop01.Models;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace WpfBookRentalShop01.ViewModels
 {
-    public partial class BooksViewModel : ObservableObject
+    public partial class RentalsViewModel : ObservableObject
     {
         private IDialogCoordinator dialogCoordinator;
 
-        private ObservableCollection<Book> _books;
+        private ObservableCollection<Rental> _rentals;
 
-        public ObservableCollection<Book> Books
+        public ObservableCollection<Rental> Rentals
         {
-            get => _books;
-            set => SetProperty(ref _books, value);
+            get => _rentals;
+            set => SetProperty(ref _rentals, value);
         }
 
-        private Book _selectedBook;
+        private Rental _selectedRental;
 
-        public Book SelectedBook
+        public Rental SelectedRental
         {
-            get => _selectedBook;
+            get => _selectedRental;
             set
             {
-                SetProperty(ref _selectedBook, value);
+                SetProperty(ref _selectedRental, value);
                 _isUpdate = true;
             }
         }
-
         private bool _isUpdate;
 
-        public BooksViewModel(IDialogCoordinator coordinator)
+        public RentalsViewModel(IDialogCoordinator coordinator)
         {
             this.dialogCoordinator = coordinator;
             InitVariable();
             LoadGridFromDb();
         }
-
         private void InitVariable()
         {
-            SelectedBook = new Book
+            SelectedRental = new Rental
             {
                 Idx = 0,
-                Division = string.Empty,
-                Names = string.Empty,
-                Author = string.Empty,
-                ISBN = string.Empty,
-                ReleaseDate = DateTime.Now,
-                Price = 0,
+                MemberIdx = 0,
+                BookIdx = 0,
+                RentalDate = DateTime.MinValue,
+                ReturnDate = DateTime.MinValue,
             };
             _isUpdate = false;
         }
@@ -65,9 +62,9 @@ namespace WpfBookRentalShop01.ViewModels
         {
             try
             {
-                string query = "SELECT idx, division, names, author, isbn, releasedate, price FROM bookstbl";
+                string query = "SELECT idx, memberidx, bookidx, rentaldate, returndate FROM rentaltbl";
 
-                ObservableCollection<Book> books = new ObservableCollection<Book>();
+                ObservableCollection<Rental> rentals = new ObservableCollection<Rental>();
 
                 using (MySqlConnection conn = new MySqlConnection(Common.CONNSTR))
                 {
@@ -78,26 +75,22 @@ namespace WpfBookRentalShop01.ViewModels
                     while (reader.Read())
                     {
                         var idx = reader.GetInt32("idx");
-                        var division = reader.GetString("division");
-                        var names = reader.GetString("names");
-                        var author = reader.GetString("author");
-                        var isbn = reader.GetString("isbn");
-                        var releaseDate = reader.GetDateTime("releasedate");
-                        var price = reader.GetInt32("price");
+                        var memberidx = reader.GetInt32("memberidx");
+                        var bookidx = reader.GetInt32("bookidx");
+                        var rentaldate = reader.GetDateTime("rentaldate");
+                        var returndate = reader.GetDateTime("renturndate");
 
-                        books.Add(new Book
+                        rentals.Add(new Rental
                         {
                             Idx = idx,
-                            Division = division,
-                            Names = names,
-                            Author = author,
-                            ISBN = isbn,
-                            ReleaseDate = releaseDate,
-                            Price = price
+                            MemberIdx = idx,
+                            BookIdx = idx,
+                            RentalDate = rentaldate,
+                            ReturnDate = returndate,
                         });
                     }
                 }
-                Books = books; // View에 바인딩필요
+                Rentals = rentals; // View에 바인딩필요
             }
             catch (Exception ex)
             {
@@ -106,7 +99,6 @@ namespace WpfBookRentalShop01.ViewModels
             }
             Common.LOGGER.Info("책 데이터 로드");
         }
-        #region
         [RelayCommand]
         public void SetInit()
         {
@@ -126,42 +118,38 @@ namespace WpfBookRentalShop01.ViewModels
                     // 기존 데이터 수정
                     if (_isUpdate)
                     {
-                        query = @"UPDATE bookstbl
-                                     SET division = @division,
-                                         names = @names,
-                                         author = @author,
-                                         isbn = @isbn,
-                                         releaseDate = @releaseDate,
-                                         price = @price
+                        query = @"UPDATE rentaltbl
+                                     SET memberidx = @memberidx,
+                                         bookidx = @bookidx,
+                                         rentaldate = @rentaldate,                                         rentalDate = @rentalDate,                                         rentalDate = @rentalDate,
+                                         returndate = @returndate,
                                    WHERE idx = @idx";
                     }
                     // 새 데이터 신규 등록
                     else
                     {
-                        query = @"INSERT INTO bookstbl (division, names, author, isbn, releaseDate, price)
-                                  VALUES (@division, @names, @author, @isbn, @releaseDate, @price);";
+                        query = @"INSERT INTO rentaltbl (memberidx, bookidx, rentaldate, returndate)
+                                  VALUES (@memberidx, @bookidx, @rentaldate, @returndate);";
                     }
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@division", SelectedBook.Division);
-                    cmd.Parameters.AddWithValue("@names", SelectedBook.Names);
-                    cmd.Parameters.AddWithValue("@author", SelectedBook.Author);
-                    cmd.Parameters.AddWithValue("@isbn", SelectedBook.ISBN);
-                    cmd.Parameters.AddWithValue("@releaseDate", SelectedBook.ReleaseDate);
-                    cmd.Parameters.AddWithValue("@price", SelectedBook.Price);
+                    cmd.Parameters.AddWithValue("@division", SelectedRental.MemberIdx);
+                    cmd.Parameters.AddWithValue("@names", SelectedRental.BookIdx);
+                    cmd.Parameters.AddWithValue("@author", SelectedRental.RentalDate);
+                    cmd.Parameters.AddWithValue("@isbn", SelectedRental.ReturnDate);
                     // 업데이트일때만 @idx필요
-                    if (_isUpdate) cmd.Parameters.AddWithValue("@idx", SelectedBook.Idx);
+                    if (_isUpdate) cmd.Parameters.AddWithValue("@idx", SelectedRental.Idx);
 
                     var resultCnt = cmd.ExecuteNonQuery();
 
                     if (resultCnt > 0)
                     {
-                        Common.LOGGER.Info("책 데이터 저장완료!");
+                        Common.LOGGER.Info("대여 데이터 저장완료!");
                         await this.dialogCoordinator.ShowMessageAsync(this, "저장", "저장성공!");
                     }
                     else
                     {
-                        Common.LOGGER.Info("책 데이터 저장실패!");
+                        Common.LOGGER.Info("대여 데이터 저장실패!");
                         await this.dialogCoordinator.ShowMessageAsync(this, "저장", "저장실패!");
                     }
                 }
@@ -191,19 +179,19 @@ namespace WpfBookRentalShop01.ViewModels
 
             try
             {
-                string query = "DELETE FROM bookstbl WHERE idx = @idx";
+                string query = "DELETE FROM rentaltbl WHERE idx = @idx";
 
                 using (MySqlConnection conn = new MySqlConnection(Common.CONNSTR))
                 {
                     conn.Open();
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@idx", SelectedBook.Idx);
+                    cmd.Parameters.AddWithValue("@idx", SelectedRental.Idx);
 
                     int resultCnt = cmd.ExecuteNonQuery(); // 한건 삭제가되면 resultCnt = 1, 안지워지면 resultCnt = 0
 
                     if (resultCnt > 0)
                     {
-                        Common.LOGGER.Info($"책 데이터 {SelectedBook.Idx} / {SelectedBook.Names} 삭제완료!");
+                        Common.LOGGER.Info($"대여 데이터 {SelectedRental.Idx} 삭제완료!");
                         await this.dialogCoordinator.ShowMessageAsync(this, "삭제", "삭제성공!");
                     }
                     else
@@ -220,6 +208,5 @@ namespace WpfBookRentalShop01.ViewModels
             }
             LoadGridFromDb(); // 저장이 끝난 후 다시 DB내용을 그리드에 다시 그림
         }
-        #endregion
     }
 }
