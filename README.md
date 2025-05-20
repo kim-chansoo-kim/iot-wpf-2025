@@ -519,3 +519,10 @@ https://github.com/user-attachments/assets/2fdccb3e-8042-4f03-937e-5fed154b42cf
 
 
    
+## 10일차
+
+### 스마트홈 연동 모니터링앱 (계속)
+
+#### 스마트홈 기기 실제 IoT센서데이터 모니터링 앱
+
+#### 스마트홈 WPF 실시간 시각화
